@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Final Reading Practice</title>
+<style>
+/* VOICE: calm exam room, warm and focused
+   IDEA: a marked-up exam booklet - passage on the left, answer sheet on the right
+   PICTURE: the split reading desk with highlighter pens
+   COLOUR and TYPE: terracotta + sage on warm paper; Segoe/Tahoma, large readable body
+   LAYOUT: sticky header, tabs, two-pane reading desk that stacks on phones */
+:root{color-scheme:light;--paper:#FBF7F1;--card:#fff;--ink:#2B2624;--muted:#6E6560;--terra:#B9502F;--terra-d:#8A3720;--terra-l:#F6E1D7;--sage:#5E8063;--sage-d:#3F5C44;--sage-l:#E2ECE0;--line:#E6DCD2;--ok:#2F7D4A;--bad:#B3261E;--ng:#8A6D1F}
+*{box-sizing:border-box;min-width:0}
+html{scroll-padding-top:120px}
+body{margin:0;background:var(--paper);color:var(--ink);font:18px/1.65 "Segoe UI",Tahoma,Arial,sans-serif;overflow-x:clip}
+button,input,select{font:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--sage);outline-offset:2px}
+header{position:sticky;top:0;z-index:40;background:var(--terra-d);color:#fff;box-shadow:0 2px 10px rgba(0,0,0,.15)}
+.hrow{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;padding:10px max(3vw,14px)}
+.brand{font-weight:700;font-size:20px;line-height:1.2;margin-right:auto}
+.brand small{display:block;font-weight:400;font-size:14px;opacity:.85}
+.name{padding:8px 12px;border-radius:10px;border:0;width:190px;font-size:16px}
+.timer{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.12);padding:4px 6px 4px 12px;border-radius:12px}
+.timer b{font-variant-numeric:tabular-nums;font-size:20px;min-width:66px}
+.hbtn{background:#fff;color:var(--terra-d);border:0;border-radius:10px;padding:8px 14px;font-weight:600;font-size:15px;min-height:40px}
+.hbtn.ghost{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.6)}
+nav{display:flex;gap:4px;padding:0 max(3vw,14px);overflow-x:auto;background:var(--terra)}
+nav button{background:transparent;border:0;color:#fff;padding:12px 16px;font-weight:600;font-size:16px;white-space:nowrap;border-bottom:4px solid transparent;opacity:.85}
+nav button.on{border-bottom-color:#fff;opacity:1;background:rgba(255,255,255,.1)}
+main{padding:18px max(3vw,14px) 60px;max-width:1500px;margin:0 auto}
+.view{display:none}.view.on{display:block}
+.desk{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:18px;align-items:start}
+.pane{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 2px 0 var(--line)}
+.ptext{position:sticky;top:122px;max-height:calc(100vh - 140px);display:flex;flex-direction:column}
+.tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line);background:var(--sage-l);border-radius:16px 16px 0 0}
+.tools .lab{font-size:14px;color:var(--sage-d);font-weight:700;margin-right:2px}
+.pen{width:36px;height:36px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 1px #bbb}
+.pen.on{box-shadow:0 0 0 3px var(--ink)}
+.pen.y{background:#FFE86B}.pen.g{background:#A9E5A0}.pen.p{background:#F7B3CF}.pen.b{background:#A8D4F5}
+.pen.er{background:#fff;font-size:17px;line-height:1}
+.tbtn{border:1.5px solid var(--sage);background:#fff;color:var(--sage-d);border-radius:10px;padding:6px 12px;font-size:15px;font-weight:600;min-height:38px}
+.tbtn.on{background:var(--sage);color:#fff}
+.scrollp{overflow-y:auto;padding:6px 22px 24px}
+.ptitle{font-size:clamp(24px,3vw,32px);line-height:1.15;margin:14px 0 4px;color:var(--terra-d);text-wrap:balance}
+.pnote{color:var(--muted);font-size:15px;margin:0 0 10px}
+.para{display:grid;grid-template-columns:34px 1fr;gap:6px;margin:12px 0;border-radius:10px;padding:4px 6px}
+.para .L{font-weight:800;color:var(--terra);font-size:20px}
+.para p{margin:0}
+.para.flash{animation:fl 2.2s ease}
+@keyframes fl{0%,60%{background:#FFF0B3}100%{background:transparent}}
+mark.hl{padding:0 1px;border-radius:3px;color:inherit}
+mark.hl-y{background:#FFE86B}mark.hl-g{background:#A9E5A0}mark.hl-p{background:#F7B3CF}mark.hl-b{background:#A8D4F5}
+body.erasing mark.hl{cursor:pointer;outline:1px dashed #999}
+.g{cursor:help}
+.showkw .g{border-bottom:2px dotted var(--terra);font-weight:600;color:var(--terra-d)}
+#tip{position:fixed;z-index:60;max-width:300px;background:var(--ink);color:#fff;border-radius:12px;padding:10px 14px;font-size:15px;line-height:1.45;display:none;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+#tip b{font-size:17px}#tip .ar{display:block;font-size:19px;direction:rtl;text-align:right;color:#FFD9C9;margin-top:4px;font-family:Tahoma,Arial,sans-serif}
+#hlbar{position:fixed;z-index:61;display:none;gap:6px;background:var(--ink);padding:6px;border-radius:999px;box-shadow:0 6px 18px rgba(0,0,0,.3)}
+#hlbar .pen{width:32px;height:32px}
+.qs{padding:8px 20px 24px}
+.grp{border-top:2px solid var(--line);padding-top:12px;margin-top:16px}
+.grp:first-child{border-top:0;margin-top:0}
+.gh{font-weight:800;color:var(--sage-d);font-size:19px}
+.gi{color:var(--muted);font-size:16px;margin:2px 0 10px}
+.q{margin:12px 0;padding:10px 12px;border-radius:12px;border:1.5px solid transparent}
+.q .n{display:inline-block;min-width:30px;height:30px;border-radius:8px;background:var(--terra);color:#fff;font-weight:700;text-align:center;font-size:16px;line-height:30px;margin-right:8px;padding:0 6px}
+.opts{display:grid;gap:6px;margin-top:8px}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:8px 12px;border:1.5px solid var(--line);border-radius:10px;background:#fff;cursor:pointer;font-size:17px}
+.opt input{margin-top:6px;width:18px;height:18px;flex:none;accent-color:var(--terra)}
+.opt:hover{border-color:var(--terra)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:6px 16px;font-weight:700;min-height:40px;font-size:16px}
+.chip.on{background:var(--terra);border-color:var(--terra);color:#fff}
+.txt{border:1.5px solid #CDBFB3;border-radius:8px;padding:5px 10px;width:210px;max-width:100%;font-size:17px;background:#FFFDF9}
+.txt.inl{width:170px}
+select.sel{border:1.5px solid #CDBFB3;border-radius:8px;padding:5px 8px;font-size:17px;background:#FFFDF9;min-height:40px}
+.box{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;background:var(--sage-l);border-radius:12px;padding:10px 14px;margin:8px 0;font-size:17px}
+.sumtxt{line-height:2.3;background:#FFFDF9;border:1px solid var(--line);border-radius:12px;padding:12px 16px}
+.sumtxt h4{margin:0 0 4px;text-align:center;font-size:18px}
+.warn{color:var(--bad);font-size:14px;display:block}
+.q.right{border-color:var(--ok);background:#EEF7F0}.q.wrong{border-color:var(--bad);background:#FBEDEC}
+.fb{display:none;margin-top:8px;font-size:16px;padding:8px 12px;border-radius:10px;background:#fff;border:1px dashed var(--line)}
+.checked .fb{display:block}
+.fb .ev{border:0;background:var(--sage);color:#fff;border-radius:8px;padding:4px 10px;font-size:14px;margin-left:6px}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.big{background:var(--terra);color:#fff;border:0;border-radius:12px;padding:12px 22px;font-weight:700;font-size:17px;min-height:48px}
+.big.alt{background:var(--sage)}
+.big.out{background:#fff;color:var(--terra-d);border:2px solid var(--terra)}
+.pscore{font-weight:700;color:var(--sage-d);font-size:18px;margin-top:10px}
+/* glossary drawer */
+#drawer{position:fixed;top:0;right:0;height:100%;width:min(480px,100%);background:#fff;z-index:70;box-shadow:-8px 0 30px rgba(0,0,0,.2);transform:translateX(105%);transition:transform .3s;display:flex;flex-direction:column}
+#drawer.open{transform:none}
+.dh{background:var(--sage-d);color:#fff;padding:14px 18px;display:flex;gap:10px;align-items:center}
+.dh h3{margin:0;font-size:20px;margin-right:auto}
+.dctl{display:flex;gap:8px;padding:10px 18px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.dctl input{flex:1;padding:8px 12px;border:1.5px solid var(--line);border-radius:10px;font-size:16px;min-width:140px}
+.dlist{overflow-y:auto;padding:6px 18px 30px}
+.gw{padding:10px 0;border-bottom:1px solid var(--line)}
+.gw b{color:var(--terra-d);font-size:18px}.gw i{color:var(--muted);font-size:14px;margin-left:6px}
+.gw .m{font-size:16px}
+.gw .ar{direction:rtl;text-align:right;font-size:19px;color:var(--sage-d);font-family:Tahoma,Arial,sans-serif}
+.hidear .gw .ar{filter:blur(6px);cursor:pointer}
+.gw .ar.peek{filter:none}
+#shade{position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:65;display:none}
+/* word workout + results */
+.wrap{max-width:980px;margin:0 auto}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 22px;margin-bottom:18px}
+.card h2{margin:0 0 6px;color:var(--terra-d);font-size:26px;line-height:1.2}
+.bank{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.bank span{background:var(--terra-l);color:var(--terra-d);font-weight:700;border-radius:999px;padding:4px 14px;font-size:16px}
+.bank span.used{opacity:.35;text-decoration:line-through}
+.ws{margin:10px 0;padding:8px 10px;border-radius:10px}
+.ws.right{background:#EEF7F0}.ws.wrong{background:#FBEDEC}
+.score{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:12px 0}
+.tile{background:var(--sage-l);border-radius:14px;padding:14px 16px}
+.tile .v{font-size:36px;font-weight:800;color:var(--terra-d);line-height:1.1}
+.tile .k{font-size:15px;color:var(--sage-d);font-weight:600}
+.bar{height:14px;background:#EEE6DE;border-radius:999px;overflow:hidden;margin-top:4px}
+.bar i{display:block;height:100%;background:var(--sage)}
+.trow{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,2fr) 60px;gap:12px;align-items:center;padding:6px 0;font-size:16px}
+.trow .pc{text-align:right;font-weight:700}
+.rev{width:100%;border-collapse:collapse;font-size:16px}
+.rev th,.rev td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.rev .ok{color:var(--ok);font-weight:700}.rev .no{color:var(--bad);font-weight:700}
+.intro{background:var(--terra-l);border-radius:14px;padding:12px 18px;margin-bottom:16px;font-size:17px}
+.intro b{color:var(--terra-d)}
+#cert{display:none}
+.certbox{border:10px double var(--terra);border-radius:18px;padding:34px;text-align:center;background:#FFFDF8}
+.certbox h2{font-size:36px;color:var(--terra-d);margin:0}
+.certbox .who{font-size:34px;font-weight:800;color:var(--sage-d);margin:14px 0;border-bottom:2px solid var(--line);display:inline-block;padding:0 30px}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:90}
+footer{text-align:center;color:var(--muted);font-size:14px;padding:20px}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:12px;display:none;z-index:95;font-size:16px}
+@media(max-width:900px){.desk{grid-template-columns:minmax(0,1fr)}.ptext{position:static;max-height:none}.scrollp{overflow:visible}}
+@media(max-width:600px){body{font-size:17px}.name{width:140px}.trow{grid-template-columns:minmax(0,1fr) 60px}.trow .bar{grid-column:1/-1;order:3}.scrollp{padding:6px 14px 20px}.qs{padding:8px 12px 20px}}
+@media print{header,nav,main,footer,#drawer{display:none!important}#cert{display:block!important}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="hrow">
+    <div class="brand">Final Reading Practice <small>IELTS Academic · 3 passages · 40 questions · LSC 0316</small></div>
+    <input class="name" id="sname" placeholder="Your name" aria-label="Your name">
+    <div class="timer" aria-label="Timer"><span>⏱</span><b id="clock">60:00</b><button class="hbtn" id="tbtn">Start</button></div>
+    <button class="hbtn ghost" id="saveB">Save</button>
+    <label class="hbtn ghost" style="display:inline-flex;align-items:center">Load<input type="file" id="loadF" accept=".json" hidden></label>
+  </div>
+  <nav id="tabs">
+    <button data-v="p1" class="on">Passage 1</button>
+    <button data-v="p2">Passage 2</button>
+    <button data-v="p3">Passage 3</button>
+    <button data-v="ww">Word Workout</button>
+    <button data-v="res">Results</button>
+  </nav>
+</header>
+
+<main>
+  <div class="view on" id="v-p1"></div>
+  <div class="view" id="v-p2"></div>
+  <div class="view" id="v-p3"></div>
+  <div class="view" id="v-ww"><div class="wrap" id="wwBody"></div></div>
+  <div class="view" id="v-res"><div class="wrap" id="resBody"></div></div>
+</main>
+
+<div id="tip" role="tooltip"></div>
+<div id="hlbar"><button class="pen y" data-c="y" aria-label="Yellow"></button><button class="pen g" data-c="g" aria-label="Green"></button><button class="pen p" data-c="p" aria-label="Pink"></button><button class="pen b" data-c="b" aria-label="Blue"></button></div>
+<div id="shade"></div>
+<aside id="drawer" aria-label="Glossary">
+  <div class="dh"><h3 id="dTitle">Glossary</h3><button class="hbtn" id="dClose">Close ✕</button></div>
+  <div class="dctl"><input id="dSearch" placeholder="Search a word…"><button class="tbtn" id="dHide">Hide Arabic (test me)</button></div>
+  <div class="dlist" id="dList"></div>
+</aside>
+<div id="cert"></div>
+<canvas id="confetti"></canvas>
+<div id="toast"></div>
+<footer>Practice texts written for this course · Designed by: Nazila Motahari</footer>
+
+<script>
+{
+/* ================= DATA ================= */
+const GL = {
+1:[
+["guarantee","verb","to make certain that something will happen","يضمن"],
+["effectiveness","noun","how well something works","الفعالية"],
+["objectives","noun","goals or aims","الأهداف"],
+["flexible","adj","able to change easily to suit different needs","مرن"],
+["physically present","phrase","actually there in person","حاضر شخصيًا"],
+["at their own pace","phrase","at the speed that suits them","بالسرعة التي تناسبهم"],
+["immediate feedback","phrase","comments or results that you get at once","تغذية راجعة فورية"],
+["participate","verb","to take part","يشارك"],
+["curators","noun","people who look after a museum's collection","أمناء المتاحف"],
+["misconceptions","noun","wrong ideas or beliefs","مفاهيم خاطئة"],
+["evaluate","verb","to judge the value or quality of something","يقيّم"],
+["disadvantaged","adj","having fewer chances, e.g. less money or education","أقل حظًا / محروم"],
+["inequality","noun","an unfair difference between groups of people","عدم المساواة"],
+["circumstances","noun","the conditions of someone's life","الظروف"],
+["integration","noun","combining something new into a system successfully","الدمج"],
+["inaccurate","adj","not correct","غير دقيق"],
+["implementation","noun","putting a plan into action","التطبيق / التنفيذ"],
+["adopting","verb","starting to use something new","تبنّي"],
+["sustainable","adj","able to continue for a long time","مستدام"]],
+2:[
+["intense","adj","very strong","شديد"],
+["psychological","adj","connected with the mind","نفسي"],
+["withdrawal","noun","leaving or stopping taking part in something","انسحاب"],
+["regulate","verb","to control","ينظّم / يتحكّم في"],
+["attributed","verb","said that something was caused by something else","نسب / عزا"],
+["accumulation","noun","a slow build-up over time","تراكم"],
+["anxiety","noun","a strong feeling of worry and nervousness","القلق"],
+["dictate","verb","to control or decide","يحدّد / يفرض"],
+["demands","noun","things that are needed from you; pressures","المتطلبات"],
+["resources","noun","abilities or things that help you deal with a situation","الموارد"],
+["cope","verb","to deal successfully with something difficult","يتأقلم / يتعامل مع"],
+["outcome","noun","the result","النتيجة"],
+["physiological","adj","connected with how the body works","فسيولوجي / جسدي"],
+["perspiration","noun","sweat","التعرّق"],
+["palpitations","noun","fast or strong heartbeats that you can feel","خفقان القلب"],
+["nausea","noun","the feeling that you are going to be sick","الغثيان"],
+["tremors","noun","small shaking movements","رعشة / ارتجاف"],
+["inhibit","verb","to stop or slow something down","يعيق / يثبّط"],
+["manifest","verb","to show itself; to appear","يظهر / يتجلّى"],
+["episodes","noun","separate events or periods of something","نوبات"],
+["visualise","verb","to form a picture in your mind","يتخيّل / يتصوّر"],
+["promote","verb","to encourage or support","يعزّز"],
+["peers","noun","people of the same age or level as you","الأقران / الزملاء"],
+["recreate","verb","to make something happen again in the same way","يعيد تمثيل / يحاكي"]],
+3:[
+["universal","adj","found everywhere and in everyone","عالمي / شامل"],
+["stimuli","noun (plural)","things that cause a reaction (singular: stimulus)","المثيرات / المحفّزات"],
+["eliciting","verb","producing a reaction or feeling","يستثير"],
+["adaptation","noun","a change that helps a living thing survive","التكيّف"],
+["conducted","verb","carried out (a study, survey, interview)","أجرى"],
+["hierarchies","noun","systems where people have higher and lower positions","التسلسلات الهرمية"],
+["consecutive","adj","one after another without a break","متتالية"],
+["status","noun","a person's social or professional position","المكانة"],
+["perceived","verb","seen or understood in a particular way","يُنظر إليه / أُدرك"],
+["dominant","adj","powerful and in control","مهيمن / مسيطر"],
+["submissive","adj","willing to obey or follow others","خاضع / مُذعن"],
+["hypothesis","noun","an idea that scientists test","فرضية"],
+["facilitate","verb","to make easier","يسهّل"],
+["recruited","verb","found people to join something","استقطب / جنّد"],
+["ostensibly","adv","apparently (but not really)","ظاهريًا"],
+["randomly assigned","phrase","put into groups by chance","وُزّعوا عشوائيًا"],
+["tedious","adj","long, boring and repetitive","مملّ"],
+["significantly","adv","by a large, clear amount","بشكل ملحوظ"],
+["replicated","verb","repeated and got the same results","كرّر"],
+["respite","noun","a short rest from something difficult","استراحة / فترة راحة"],
+["replenish","verb","to fill up again","يجدّد / يعيد ملء"],
+["persistence","noun","continuing even when something is difficult","المثابرة"],
+["stimulation","noun","things that make you active or interested","التحفيز"],
+["energising","adj","giving energy","منشّط / يمنح الطاقة"]]
+};
+
+const P = [
+{id:1,title:"Screens in the Gallery: Do Digital Tools Make Better Museums?",note:"You should spend about 20 minutes on Questions 1–13.",
+paras:[
+["A","Over the past two decades, digital technology has become an established feature of museum life. Traditional institutions, in which visitors primarily observe objects behind glass and consult brief printed labels, are increasingly supplemented by touch screens, mobile applications and virtual tours. The rapid development of these innovations has prompted museum directors to reconsider what a visit should involve and whom it is intended to serve. However, the installation of new screens does not automatically [[guarantee]] a better experience. The [[effectiveness]] of technology depends largely on how it is used and whether it genuinely supports the educational [[objectives]] of the institution."],
+["B","One major advantage of digital tools is that they provide more [[flexible]] access to collections. Visitors are no longer required to be [[physically present]] in order to explore an exhibition. Online databases allow people to examine high-resolution images [[at their own pace]], zooming in on tiny details that would be impossible to see through glass. Virtual tours also make it possible for school groups in remote locations to ‘visit’ internationally renowned galleries without the expense of travel. Such opportunities are particularly valuable for individuals with limited leisure time and for elderly visitors, for whom walking around large buildings can be physically demanding."],
+["C","Technology can also accommodate a variety of visitor needs. Some people comprehend historical information more readily through animations and digital reconstructions than through written descriptions alone. Interactive displays can provide [[immediate feedback]]: a short quiz at the end of a gallery, for example, can show children which facts they remembered and which they missed. Augmented reality applications allow visitors to point a phone at a ruined building and observe how it might originally have looked. When properly designed, these activities can stimulate curiosity and encourage visitors to [[participate]] actively rather than observe passively. Nevertheless, [[curators]] must ensure that the screens do not draw attention away from the genuine objects on display."],
+["D","A second debate concerns the role of human guides. Some commentators predict that applications and audio guides will eventually replace them, since visitors can now obtain information independently by scanning a code positioned beside each object. However, receiving information is not the same as understanding it. Guides remain essential in responding to unexpected questions, correcting widespread [[misconceptions]] about the past, and helping visitors [[evaluate]] competing interpretations of historical events. They also create a welcoming atmosphere and encourage discussion within groups. In most institutions, technology functions most successfully as a complement to the guide rather than as a substitute."],
+["E","Technology also raises important questions of fairness. Not every visitor is able to use digital devices with confidence. Older people and visitors from [[disadvantaged]] backgrounds may not own a smartphone, may have no mobile data, or may feel uncomfortable with unfamiliar equipment. If essential information is available exclusively through an application, these visitors may leave with a considerably poorer understanding than others. In this way, digital tools can intensify [[inequality]] rather than reduce it. Museums therefore need to take visitors’ [[circumstances]] into account and continue to offer printed guides alongside digital ones."],
+["F","The successful [[integration]] of technology additionally requires careful planning and sustained investment in personnel. Employees need professional training in how digital tools can enhance their work, and managers must allocate appropriate budgets and set clear guidelines for how technology is used in each gallery. Equipment also requires regular maintenance, since a broken screen can create a worse impression than having no screen at all. Furthermore, visitors who use museum applications frequently share personal information, such as their location and interests, so institutions have a responsibility to protect this data. Online descriptions must also be verified carefully, because [[inaccurate]] information can spread quickly once it appears on the internet."],
+["G","In conclusion, digital technology has the potential to enrich museums by widening access, accommodating diverse needs and creating more memorable visits. However, its benefits depend on appropriate [[implementation]]. Museums should avoid [[adopting]] new tools simply because they are fashionable or because comparable institutions have done so. Instead, they should consider whether a particular tool genuinely improves understanding and whether all visitors are able to benefit from it. A thoughtful combination of skilled staff, meaningful digital experiences and equal access is more likely to produce [[sustainable]] improvements."]],
+groups:[
+{type:"tf",h:"Questions 1–5",i:"Do the following statements agree with the information given in Reading Passage 1? Choose TRUE, FALSE or NOT GIVEN.",items:[
+{n:1,q:"Online collections allow people to see small details of objects more clearly than they could inside the museum.",a:"TRUE",ev:"B",ex:"‘zooming in on tiny details that would be impossible to see through glass’ – online you can see more."},
+{n:2,q:"Virtual tours are more popular with schools in cities than with schools in remote areas.",a:"NOT GIVEN",ev:"B",ex:"Remote schools are mentioned, but there is no comparison of popularity with city schools."},
+{n:3,q:"The writer believes that adding new screens will always improve a museum visit.",a:"FALSE",ev:"A",ex:"‘does not automatically guarantee a better experience’ = not always."},
+{n:4,q:"Some museum visitors may not have a phone that can use a museum app.",a:"TRUE",ev:"E",ex:"‘may not own a smartphone, may have no mobile data’."},
+{n:5,q:"Museums should stop producing printed guides once an app is available.",a:"FALSE",ev:"E",ex:"The writer says museums should ‘continue to offer printed guides alongside digital ones’."}]},
+{type:"mcq",h:"Questions 6–9",i:"Choose the correct letter, A, B, C or D.",items:[
+{n:6,q:"According to Paragraph B, virtual tours are useful for school groups because they",o:["give teachers more control over each lesson.","let pupils visit galleries without paying to travel.","include quizzes that check what pupils remember.","allow pupils to handle copies of real objects safely online."],a:1,ev:"B",ex:"‘without the expense of travel’ = without paying to travel."},
+{n:7,q:"In Paragraph C, the writer warns that technology should not",o:["be used to show visitors what old buildings once looked like.","be designed mainly for children and their families.","take visitors’ attention away from the real objects.","replace the written labels placed next to objects."],a:2,ev:"C",ex:"‘screens do not draw attention away from the genuine objects’."},
+{n:8,q:"What is the main point of Paragraph D?",o:["Human guides are still valuable even when information is digital.","Scanning a code is the quickest way to learn about an object.","Audio guides give more accurate facts than human guides do.","Visitors generally prefer to explore museums without any group conversation."],a:0,ev:"D",ex:"‘receiving information is not the same as understanding it… Guides remain essential’."},
+{n:9,q:"According to Paragraph F, why must online descriptions be checked carefully?",o:["Visitors often complain to managers about small mistakes.","Broken screens sometimes show the wrong descriptions.","Other museums may copy the texts without permission.","Wrong information can travel fast on the internet."],a:3,ev:"F",ex:"‘inaccurate information can spread quickly’ = wrong information can travel fast."}]},
+{type:"short",lim:3,h:"Questions 10–13",i:"Answer the questions below. Choose NO MORE THAN THREE WORDS from the passage for each answer.",items:[
+{n:10,q:"What technology lets visitors see how a ruined building might once have looked?",acc:["augmented reality applications","augmented reality","augmented reality apps"],show:"augmented reality (applications)",ev:"C",ex:"‘Augmented reality applications allow visitors to point a phone at a ruined building’."},
+{n:11,q:"What, at the end of a gallery, can show children which facts they remembered?",acc:["a short quiz","short quiz","a quiz","quiz"],show:"(a) short quiz",ev:"C",ex:"‘a short quiz at the end of a gallery… can show children which facts they remembered’."},
+{n:12,q:"What must managers set for how technology is used in each gallery?",acc:["clear guidelines","guidelines"],show:"clear guidelines",ev:"F",ex:"‘set clear guidelines for how technology is used in each gallery’."},
+{n:13,q:"What can create a worse impression than having no screen at all?",acc:["a broken screen","broken screen","broken screens"],show:"(a) broken screen",ev:"F",ex:"‘a broken screen can create a worse impression than having no screen at all’."}]}
+]},
+{id:2,title:"Stage Fright: Performing Under Pressure",note:"You should spend about 20 minutes on Questions 14–26.",
+paras:[
+["A","Standing on a stage in front of hundreds of people is never easy, even for experienced performers. Musicians spend years developing technical skill, yet they also face [[intense]] [[psychological]] pressure every time they perform. One young violinist, explaining her [[withdrawal]] from the final round of a national competition, described how she had suddenly been unable to [[regulate]] her breathing and how her hands had shaken so badly that she could not hold the bow steadily. She later [[attributed]] the problem not to a lack of practice but to the [[accumulation]] of months of expectation from her family, her teachers and the local newspapers. Her experience is far from unusual: surveys of professional orchestras suggest that a significant proportion of players have, at some point in their careers, performed worse than expected because of nerves rather than any lack of ability."],
+["B","Psychologists describe stage fright as a form of performance [[anxiety]]. It is not simply a sign that a performer is weak or unprepared. Several factors [[dictate]] how strongly a person reacts, but most researchers agree that it develops when a performer judges that the [[demands]] of a situation are greater than the [[resources]] they have to [[cope]] with them. Demands include the difficulty of the music, the size and importance of the audience, and the fear of making a mistake in public. Resources include the performer’s confidence, the amount of preparation they have done, and how much control they believe they have over the [[outcome]]. One musician may therefore see a concert as an exciting opportunity, while another sees exactly the same event as a danger to be survived. Importantly, these judgements are not fixed. Each new demand, such as a change of venue or the unexpected presence of a well-known critic in the audience, can shift the balance, which helps to explain why the same performer may feel calm at one concert and terrified at the next."],
+["C","The body’s response to this judgement can be dramatic. When a person feels threatened, the brain prepares the body to fight or to run away. Breathing becomes fast and shallow, the heart beats rapidly, and blood is sent away from the hands and feet towards the large muscles. These [[physiological]] changes were useful for our ancestors when they faced wild animals, but they are far less helpful on a concert stage. For singers, the result may be a dry mouth and an unsteady voice; for pianists and violinists, it is more often cold, stiff fingers. Other common symptoms include [[perspiration]], heart [[palpitations]], [[nausea]] and muscle [[tremors]]. These reactions can also [[inhibit]] concentration, making it harder to remember long pieces of music."],
+["D","Surprisingly, experience does not always solve the problem. Some of the world’s most respected musicians have admitted that they still feel unwell before concerts after decades on stage. Stage fright may also [[manifest]] itself differently depending on the situation: a cellist who feels relaxed playing in an orchestra may become extremely anxious when asked to perform alone. Researchers believe this is because a solo performer feels completely responsible for the result, with no colleagues to share the attention. Occasional nerves are normal, but repeated [[episodes]] of severe stage fright should not be ignored. Over time, they can remove the pleasure of making music and may even lead talented people to give up performing completely."],
+["E","Fortunately, there are practical techniques that can help. Slow breathing, in which the performer breathes out for longer than they breathe in, can calm the heart and steady the hands. Many musicians also use mental rehearsal: they close their eyes and [[visualise]] walking onto the stage, hearing the audience and playing the opening bars successfully. This creates a sense of familiarity and control before the real event. Mental rehearsal is not a replacement for physical practice, but combining the two appears to produce better results than relying on either method alone. Teachers and parents can also [[promote]] a healthier attitude through the words they choose, describing a concert as a chance to share music rather than an examination to be passed."],
+["F","Finally, gradual exposure is one of the most effective forms of preparation. Many music schools now ask students to perform for small groups of [[peers]] long before they face a large audience. Some teachers even [[recreate]] the pressure of a real competition during ordinary lessons, for example by inviting strangers to listen or by filming the performance and showing it to the class. Although these experiences increase the demands on students compared with normal practice, they give them a safe opportunity to build the resources they will need when the real moment arrives. Musicians who regularly practise under such conditions tend to report lower levels of anxiety in genuine performances, although the benefit appears to be greatest when the exposure begins early in their training and increases gradually rather than suddenly."]],
+groups:[
+{type:"match",L:["A","B","C","D","E","F"],h:"Questions 14–18",i:"Reading Passage 2 has six paragraphs, A–F. Which paragraph contains the following information? NB You may use any letter more than once.",items:[
+{n:14,q:"an explanation of why the body’s reaction to fear was once useful",a:"C",ev:"C",ex:"‘These physiological changes were useful for our ancestors when they faced wild animals’."},
+{n:15,q:"the reason a performer gave for her own difficulties",a:"A",ev:"A",ex:"‘She later attributed the problem… to the accumulation of months of expectation’."},
+{n:16,q:"evidence that experience does not always prevent stage fright",a:"D",ev:"D",ex:"‘experience does not always solve the problem… still feel unwell… after decades’."},
+{n:17,q:"a method in which students perform for their classmates",a:"F",ev:"F",ex:"‘perform for small groups of peers’ (peers = classmates)."},
+{n:18,q:"a list of factors that affect how a performer judges a situation",a:"B",ev:"B",ex:"Paragraph B lists the demands and the resources."}]},
+{type:"comp",lim:1,h:"Questions 19–22",i:"Complete the sentences below. Choose ONE WORD ONLY from the passage for each answer.",items:[
+{n:19,q:"One of the demands on a performer is the fear of making a ___ in public.",acc:["mistake"],ev:"B",ex:"‘the fear of making a mistake in public’."},
+{n:20,q:"When a person feels threatened, blood is sent towards the large ___.",acc:["muscles"],ev:"C",ex:"‘blood is sent… towards the large muscles’."},
+{n:21,q:"Pianists and violinists often experience cold and stiff ___.",acc:["fingers"],ev:"C",ex:"‘for pianists and violinists, it is more often cold, stiff fingers’."},
+{n:22,q:"Stage fright can make it harder for performers to remember long ___ of music.",acc:["pieces"],ev:"C",ex:"‘making it harder to remember long pieces of music’."}]},
+{type:"two",h:"Questions 23 and 24",i:"Choose TWO letters, A–E.",items:[
+{n:[23,24],q:"Which TWO facts about the young violinist are mentioned in the text?",o:["the piece of music she had planned to play","what she believed caused her difficulties","how many years she had studied the violin","a physical problem she experienced","how the judges reacted to her withdrawal"],a:[1,3],ev:"A",ex:"B: ‘attributed the problem… to the accumulation of months of expectation’. D: her hands shook and she could not regulate her breathing. The others are not mentioned."}]},
+{type:"two",h:"Questions 25 and 26",i:"Choose TWO letters, A–E.",items:[
+{n:[25,26],q:"Which TWO of the following are mentioned in Paragraphs E and F?",o:["a breathing method that can calm the heart","the use of medicine to stop shaking hands","how often mental rehearsal should be practised","the use of video recordings during lessons","the cost of joining a professional music school"],a:[0,3],ev:"E",ex:"A: ‘Slow breathing… can calm the heart’ (E). D: ‘filming the performance and showing it to the class’ (F)."}]}
+]},
+{id:3,title:"The Hidden Benefits of Boredom",note:"You should spend about 20 minutes on Questions 27–40.",
+paras:[
+["A","Almost everyone knows the feeling of boredom. Children as young as two or three complain that they have ‘nothing to do’, and the experience appears to be [[universal]] across human cultures. Even animals show signs of it: zoo animals kept in empty enclosures often pace up and down, and their behaviour improves when keepers add new [[stimuli]], such as toys or hidden food, [[eliciting]] curiosity and play. Although scientists once ignored boredom as a trivial emotion, it is now attracting serious attention from psychologists interested in attention, motivation and creativity."],
+["B","Some researchers argue that boredom, far from being a weakness, is an important [[adaptation]] that has helped humans survive. In their view, it functions rather like an internal alarm, signalling that our current activity is no longer useful or rewarding and pushing us to seek out goals that are more likely to bring benefits. Early factory owners noticed a practical side of this. Workers on repetitive production lines made more errors as the day went on, so some factories introduced short breaks, music or a regular change of task to keep employees alert. Without fully understanding the psychology, these managers had recognised that boredom could affect the quality of work."],
+["C","In one large-scale survey, researchers [[conducted]] interviews with more than 4,000 adults in fifteen countries, asking them how frequently they felt bored and in which situations the feeling was most likely to arise. Waiting, administrative paperwork and repetitive work were named as the most boring activities in almost every country, a finding the researchers had anticipated, since earlier and smaller studies had produced very similar lists. What they had not expected was the role of age: in every country surveyed, participants under the age of 25 reported feeling bored considerably more often than those over 60, despite having access to a far wider range of entertainment, from streaming services to online games, than any previous generation."],
+["D","Boredom also plays a part in social [[hierarchies]]. A research team filmed weekly meetings in twelve companies over ten [[consecutive]] weeks and analysed how employees displayed boredom. Each meeting included both senior managers and junior staff who had joined the company within the previous year. As the researchers had predicted, senior managers showed boredom much more openly – checking their phones, yawning or looking out of the window – while junior staff hid it. However, when junior employees were asked to chair a meeting themselves, they too began to display boredom more freely, suggesting that the behaviour depends on a person’s role as much as on their personality. In other words, the same individual might hide their boredom on Monday and display it openly on Tuesday, depending on whether they were leading the discussion or merely attending it."],
+["E","Video clips from these meetings were then shown to a separate group of volunteers, who were asked to judge each employee’s [[status]]. Senior managers who looked bored were [[perceived]] as confident and powerful. Junior employees who displayed exactly the same behaviour, by contrast, were generally rated as rude or lazy. The researchers concluded that open boredom is a [[dominant]] signal that only high-status people can safely use; for newcomers, a more [[submissive]] display of attention is the safer strategy. This, the authors argue, suggests that the freedom to display boredom is itself a marker of power within an organisation, and that newcomers who wish to be taken seriously may need to monitor their behaviour far more carefully than their senior colleagues do."],
+["F","Perhaps the most surprising research concerns creativity. Two psychologists tested the [[hypothesis]] that a dull activity might actually lead to more creative thinking, reasoning that when an external task fails to hold our interest, a bored mind starts to wander, and the resulting daydreaming may [[facilitate]] unusual connections between ideas that would not otherwise be made. They [[recruited]] 80 volunteers, [[ostensibly]] for a study of handwriting. Participants were [[randomly assigned]] to two groups. The first group spent fifteen minutes on a deliberately [[tedious]] task: copying telephone numbers from a list by hand. The second group went straight to the next stage."],
+["G","Both groups were then asked to think of as many uses as possible for a pair of plastic cups. They could take as long as they liked and stop whenever they felt they had run out of ideas. The participants who had copied numbers produced [[significantly]] more ideas, and independent judges rated those ideas as more original. In a follow-up study, designed partly to rule out the possibility that the first result had occurred by chance, the researchers [[replicated]] these findings and added a third group who were required only to read the numbers rather than write them – a task that offered even less to occupy the mind. This group was the most creative of all."],
+["H","Other researchers have suggested that boredom may provide a kind of mental [[respite]]. When a task demands nothing from us, the mind has a chance to rest and [[replenish]] its resources, rather like a field that is left empty for a season. However, there are limits. Boredom that continues for weeks or months is associated with poor concentration, low [[persistence]] and unhealthy habits, so the benefits seem to come from short periods rather than long ones. Some psychologists have compared this process to the way in which the body recovers after physical exercise, arguing that periods of low demand are not wasted time but an essential part of a healthy cycle of effort and rest."],
+["I","These findings challenge the common belief that boredom is something to be avoided at all costs. Short periods without [[stimulation]] may be not only harmless but actually [[energising]] for the imagination. This is worth remembering at a time when many people reach for their phones the moment they have nothing to do. By filling every quiet minute, we may be losing the creative benefits that boredom can bring. Rather than treating every empty moment as a problem to be solved, schools and workplaces might therefore benefit from allowing short periods of unstructured time, particularly before tasks that require original thinking."]],
+groups:[
+{type:"mcq",h:"Questions 27–31",i:"Choose the correct letter, A, B, C or D.",items:[
+{n:27,q:"In the first paragraph, the writer suggests that boredom",o:["is experienced mainly by adults.","exists only in human societies.","has always been of great interest to scientists.","is found in people of all cultures."],a:3,ev:"A",ex:"‘the experience appears to be universal across human cultures’."},
+{n:28,q:"What point does the writer make about early factory owners?",o:["They realised that boredom could lower the quality of work.","They believed that playing music wasted valuable working time.","They studied the psychology of their workers in detail.","They preferred employees who did one task all day long."],a:0,ev:"B",ex:"‘these managers had recognised that boredom could affect the quality of work’. They did NOT fully understand the psychology."},
+{n:29,q:"What was unexpected about the results of the survey in Paragraph C?",o:["the activities that people named as most boring","the link between age and how often people felt bored","the number of different countries that took part","the amount of entertainment available to older adults"],a:1,ev:"C",ex:"‘What they had not expected was the role of age’. The boring activities WERE expected."},
+{n:30,q:"What happened in the meetings study?",o:["Some junior employees decided to leave the company.","Senior managers asked junior staff to stop yawning.","Some employees were given a different role.","Volunteers attended the meetings in person."],a:2,ev:"D",ex:"‘when junior employees were asked to chair a meeting themselves’ = a different role."},
+{n:31,q:"What did the volunteers’ judgements in Paragraph E show?",o:["Everyone who looked bored was seen as powerful.","Junior staff were generally better at hiding boredom than seniors.","Senior managers were rated as rude when they yawned.","The same behaviour was judged differently depending on status."],a:3,ev:"E",ex:"Seniors who looked bored = powerful; juniors with ‘exactly the same behaviour’ = rude or lazy."}]},
+{type:"sum",h:"Questions 32–36",i:"Complete the summary using the list of words, A–H, below.",box:["A  original","B  relaxing","C  wander","D  dull","E  handwriting","F  ideas","G  memory","H  creativity"],
+title:"Boredom and creative thinking",
+text:"Two psychologists wanted to find out whether a {32} activity could improve creative thinking. The volunteers believed that the study was about {33}. One group copied telephone numbers before everyone was asked to think of uses for plastic cups. This group produced more ideas, and judges also rated their ideas as more {34}. The researchers suggest this is because boredom allows the mind to {35}. A later study showed that the group with the least demanding first task showed the most {36}.",
+items:[
+{n:32,a:"D",ev:"F",ex:"‘a dull activity might actually lead to more creative thinking’."},
+{n:33,a:"E",ev:"F",ex:"‘ostensibly for a study of handwriting’ – this is what they were told."},
+{n:34,a:"A",ev:"G",ex:"‘independent judges rated those ideas as more original’."},
+{n:35,a:"C",ev:"F",ex:"‘a bored mind starts to wander’."},
+{n:36,a:"H",ev:"G",ex:"The group who only read the numbers was ‘the most creative of all’."}]},
+{type:"yn",h:"Questions 37–40",i:"Do the following statements agree with the claims of the writer in Reading Passage 3? Choose YES, NO or NOT GIVEN.",items:[
+{n:37,q:"Older participants in the survey had more hobbies than younger participants.",a:"NOT GIVEN",ev:"C",ex:"The passage mentions entertainment for young people, but says nothing about hobbies."},
+{n:38,q:"The researchers’ prediction about senior managers’ behaviour in meetings was correct.",a:"YES",ev:"D",ex:"‘As the researchers had predicted, senior managers showed boredom much more openly’."},
+{n:39,q:"Participants in the creativity study were given a fixed time to complete the plastic cups task.",a:"NO",ev:"G",ex:"‘They could take as long as they liked and stop whenever they felt they had run out of ideas’."},
+{n:40,q:"Using phones to fill every spare moment may reduce people’s creativity.",a:"YES",ev:"I",ex:"‘By filling every quiet minute, we may be losing the creative benefits that boredom can bring’."}]}
+]}
+];
+
+const WW = [
+{t:"Set A · Words from Passages 1 and 2",words:["guarantee","flexible","misconceptions","evaluate","cope","attributed","intense","outcome","peers","regulate"],items:[
+["Studying hard does not ___ a high score, but it helps a lot.","guarantee"],
+["The online course is very ___: students can watch the lessons at any time.","flexible"],
+["Our teacher corrected several common ___ about how memory works.","misconceptions"],
+["Before you use a website in your essay, you should ___ whether the information is reliable.","evaluate"],
+["Mariam finds it hard to ___ with stress during exam week, so she walks every evening.","cope"],
+["Noura ___ her success to the extra reading she did every morning.","attributed"],
+["The training before the competition was ___: six hours a day for two weeks.","intense"],
+["Nobody knows the ___ of the vote yet; the results come out tomorrow.","outcome"],
+["Practising your presentation in front of your ___ is a good way to get honest feedback.","peers"],
+["Slow breathing can help you ___ your heart rate before you speak.","regulate"]]},
+{t:"Set B · Words from Passage 3",words:["universal","hypothesis","tedious","recruited","replicated","significantly","respite","facilitate","consecutive","persistence"],items:[
+["Love of stories seems to be ___: every culture in the world has them.","universal"],
+["The scientists’ ___ was that students learn new words faster after a good night’s sleep.","hypothesis"],
+["Copying the same sentence fifty times is a ___ task.","tedious"],
+["The college ___ 200 volunteers to take part in the study.","recruited"],
+["Another team ___ the experiment and got exactly the same results.","replicated"],
+["Scores improved ___ after the new method was introduced, rising from 55% to 80%.","significantly"],
+["A short walk between lessons gives students a ___ from sitting in class.","respite"],
+["Clear instructions ___ learning because students know exactly what to do.","facilitate"],
+["Our team won the debate competition three ___ years: 2024, 2025 and 2026.","consecutive"],
+["Learning a language takes ___: you must keep going even when it feels difficult.","persistence"]]}
+];
+
+/* ================= STATE ================= */
+const S = {ans:{}, ww:{}, checked:{1:false,2:false,3:false}, wwChecked:false, time:3600, hl:{}};
+let running=false, tick=null, pen="y", erasing=false, curP=1;
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const gmap={};Object.entries(GL).forEach(([p,a])=>a.forEach(w=>gmap[w[0].toLowerCase()]=w));
+const norm=s=>String(s||"").toLowerCase().replace(/[.,;:!?'"’‘()]/g,"").replace(/\s+/g," ").trim();
+const wc=s=>norm(s)?norm(s).split(" ").length:0;
+const L="ABCDE";
+
+/* ================= RENDER PASSAGES ================= */
+function paraHTML(t){return esc(t).replace(/\[\[(.+?)\]\]/g,(m,w)=>`<span class="g" data-k="${w.toLowerCase()}">${w}</span>`)}
+function qHTML(p,g){
+  let h=`<div class="grp"><div class="gh">${g.h}</div><div class="gi">${g.i}</div>`;
+  if(g.type==="sum"){
+    h+=`<div class="box">${g.box.map(b=>`<span>${esc(b)}</span>`).join("")}</div><div class="sumtxt"><h4>${esc(g.title)}</h4>`+
+      esc(g.text).replace(/\{(\d+)\}/g,(m,n)=>`<span class="q" id="q${n}" style="display:inline;padding:2px 4px;margin:0"><span class="n">${n}</span><select class="sel" data-n="${n}"><option value="">–</option>${"ABCDEFGH".split("").map(x=>`<option>${x}</option>`).join("")}</select></span>`)+`</div>`;
+    h+=g.items.map(it=>`<div class="fb" id="fb${it.n}"></div>`).join("");
+    return h+"</div>";
+  }
+  g.items.forEach(it=>{
+    const id=Array.isArray(it.n)?it.n.join("-"):it.n;
+    h+=`<div class="q" id="q${id}"><span class="n">${Array.isArray(it.n)?it.n.join("–"):it.n}</span>`;
+    if(g.type==="tf"||g.type==="yn"){const ch=g.type==="tf"?["TRUE","FALSE","NOT GIVEN"]:["YES","NO","NOT GIVEN"];
+      h+=`${esc(it.q)}<div class="chips">${ch.map(c=>`<button class="chip" data-n="${id}" data-v="${c}">${c}</button>`).join("")}</div>`}
+    else if(g.type==="match"){h+=`${esc(it.q)}<div class="chips">${g.L.map(c=>`<button class="chip" data-n="${id}" data-v="${c}">${c}</button>`).join("")}</div>`}
+    else if(g.type==="mcq"){h+=`${esc(it.q)}<div class="opts">${it.o.map((o,i)=>`<label class="opt"><input type="radio" name="r${id}" data-n="${id}" value="${i}"><span><b>${L[i]}</b>&nbsp; ${esc(o)}</span></label>`).join("")}</div>`}
+    else if(g.type==="two"){h+=`${esc(it.q)}<div class="opts">${it.o.map((o,i)=>`<label class="opt"><input type="checkbox" data-two="${id}" value="${i}"><span><b>${L[i]}</b>&nbsp; ${esc(o)}</span></label>`).join("")}</div>`}
+    else if(g.type==="short"){h+=`${esc(it.q)}<div style="margin-top:8px"><input class="txt" data-n="${id}" data-lim="${g.lim}" autocomplete="off" spellcheck="false" aria-label="Answer ${id}"><span class="warn"></span></div>`}
+    else if(g.type==="comp"){h+=esc(it.q).replace("___",`<input class="txt inl" data-n="${id}" data-lim="${g.lim}" autocomplete="off" spellcheck="false" aria-label="Answer ${id}">`)+`<span class="warn"></span>`}
+    h+=`<div class="fb" id="fb${id}"></div></div>`;
+  });
+  return h+"</div>";
+}
+P.forEach(p=>{
+  $(`#v-p${p.id}`).innerHTML=`<div class="intro"><b>How to use:</b> select any words in the passage to <b>highlight</b> them (4 colours). Turn on <b>Key words</b> to see the vocabulary, and tap a key word for its meaning in English and Arabic.</div>
+  <div class="desk"><section class="pane ptext"><div class="tools"><span class="lab">Pen</span>
+  ${["y","g","p","b"].map(c=>`<button class="pen ${c}${c==="y"?" on":""}" data-pen="${c}" aria-label="Highlighter ${c}"></button>`).join("")}
+  <button class="pen er" data-pen="er" title="Eraser: tap a highlight to remove it" aria-label="Eraser">⌫</button>
+  <button class="tbtn" data-clear="${p.id}">Clear</button><button class="tbtn kw" data-kw="${p.id}">Key words</button><button class="tbtn" data-gl="${p.id}">📖 Glossary</button></div>
+  <div class="scrollp" id="pt${p.id}"><h2 class="ptitle">Reading Passage ${p.id}</h2><h3 class="ptitle" style="font-size:22px;margin-top:0">${esc(p.title)}</h3><p class="pnote">${p.note}</p>
+  ${p.paras.map(([l,t])=>`<div class="para" id="p${p.id}${l}"><span class="L">${l}</span><p>${paraHTML(t)}</p></div>`).join("")}</div></section>
+  <section class="pane qs" id="qs${p.id}">${p.groups.map(g=>qHTML(p,g)).join("")}
+  <div class="actions"><button class="big" data-check="${p.id}">Check Passage ${p.id}</button><button class="big out" data-reset="${p.id}">Try again</button>${p.id<3?`<button class="big alt" data-go="p${p.id+1}">Next passage →</button>`:`<button class="big alt" data-go="res">See results →</button>`}</div>
+  <div class="pscore" id="ps${p.id}"></div></section></div>`;
+});
+
+/* ================= ANSWERS ================= */
+document.addEventListener("click",e=>{
+  const c=e.target.closest(".chip");
+  if(c&&!S.checked[+c.closest(".qs").id.slice(2)]){S.ans[c.dataset.n]=c.dataset.v;syncChips(c.dataset.n)}
+});
+function syncChips(n){$$(`.chip[data-n="${n}"]`).forEach(b=>b.classList.toggle("on",S.ans[n]===b.dataset.v))}
+document.addEventListener("change",e=>{
+  const t=e.target;
+  if(t.matches('input[type=radio][data-n]')){S.ans[t.dataset.n]=+t.value}
+  if(t.matches('select.sel[data-n]')){S.ans[t.dataset.n]=t.value}
+  if(t.matches('input[data-two]')){const id=t.dataset.two,boxes=$$(`input[data-two="${id}"]`),on=boxes.filter(b=>b.checked);
+    if(on.length>2){t.checked=false;toast("Choose only TWO letters.");}
+    S.ans[id]=boxes.filter(b=>b.checked).map(b=>+b.value)}
+  if(t.matches('select.wsel')){S.ww[t.dataset.k]=t.value;syncBank()}
+});
+document.addEventListener("input",e=>{
+  const t=e.target;
+  if(t.matches("input.txt[data-n]")){S.ans[t.dataset.n]=t.value;const w=t.parentNode.querySelector(".warn")||t.closest(".q").querySelector(".warn");
+    if(w)w.textContent=wc(t.value)>+t.dataset.lim?`Too many words – the limit is ${t.dataset.lim==="1"?"ONE WORD ONLY":"NO MORE THAN THREE WORDS"}.`:""}
+});
+
+function items(p){const out=[];p.groups.forEach(g=>g.items.forEach(it=>out.push({g,it})));return out}
+const TL={tf:"True / False / Not Given",yn:"Yes / No / Not Given",mcq:"Multiple choice",short:"Short answer",match:"Matching information",comp:"Sentence completion",two:"Choose TWO letters",sum:"Summary (word list)"};
+function mark(p){ // returns array of {n,type,ok,user,right,ev,ex}
+  const r=[];
+  items(p).forEach(({g,it})=>{
+    if(g.type==="two"){const u=S.ans[it.n.join("-")]||[],hits=u.filter(x=>it.a.includes(x)).length;
+      const ut=u.map(x=>L[x]).sort().join(", ")||"–",rt=it.a.map(x=>L[x]).join(", ");
+      it.n.forEach((n,i)=>r.push({n,type:g.type,ok:hits>i,user:ut,right:rt,ev:it.ev,ex:it.ex,id:it.n.join("-"),p:p.id}));return}
+    const u=S.ans[it.n];let ok=false,user=u==null||u===""?"–":u,right;
+    if(g.type==="mcq"){ok=u===it.a;user=u==null?"–":L[u];right=L[it.a]}
+    else if(g.type==="short"||g.type==="comp"){const nu=norm(u);ok=it.acc.some(a=>norm(a)===nu)&&wc(u)<=g.lim;right=it.show||it.acc[0]}
+    else{ok=u===it.a;right=it.a}
+    r.push({n:it.n,type:g.type,ok,user,right,ev:it.ev,ex:it.ex,id:String(it.n),p:p.id});
+  });
+  return r;
+}
+function showCheck(pid){
+  const p=P[pid-1],res=mark(p),box=$(`#qs${pid}`);
+  box.classList.add("checked");
+  const byId={};res.forEach(x=>{(byId[x.id]=byId[x.id]||[]).push(x)});
+  Object.entries(byId).forEach(([id,arr])=>{
+    const allOk=arr.every(x=>x.ok),q=$(`#q${id}`),f=$(`#fb${id}`);
+    if(q){q.classList.remove("right","wrong");q.classList.add(allOk?"right":"wrong")}
+    if(f)f.innerHTML=`<b>${arr.length>1?id.replace("-","–"):id}.</b> ${allOk?"✅ Correct.":"❌ Answer: <b>"+esc(arr[0].right)+"</b>."} ${esc(arr[0].ex)} <button class="ev" data-ev="${pid}${arr[0].ev}">Show in text (para ${arr[0].ev})</button>`;
+  });
+  const sc=res.filter(x=>x.ok).length;
+  $(`#ps${pid}`).textContent=`Passage ${pid}: ${sc} / ${res.length}`;
+  lockInputs(pid,true);
+}
+function lockInputs(pid,on){$$(`#qs${pid} input, #qs${pid} select`).forEach(i=>i.disabled=on)}
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-check],[data-reset],[data-go],[data-ev]");if(!b)return;
+  if(b.dataset.check){const pid=+b.dataset.check;S.checked[pid]=true;showCheck(pid);celebrateIfDone()}
+  if(b.dataset.reset){const pid=+b.dataset.reset;S.checked[pid]=false;items(P[pid-1]).forEach(({it})=>delete S.ans[Array.isArray(it.n)?it.n.join("-"):it.n]);
+    const box=$(`#qs${pid}`);box.classList.remove("checked");$$(`#qs${pid} .q`).forEach(q=>q.classList.remove("right","wrong"));lockInputs(pid,false);restoreAnswers();$(`#ps${pid}`).textContent=""}
+  if(b.dataset.go)go(b.dataset.go);
+  if(b.dataset.ev){const pid=b.dataset.ev[0];go("p"+pid);const el=$(`#p${b.dataset.ev}`);el.scrollIntoView({behavior:"smooth",block:"center"});el.classList.remove("flash");void el.offsetWidth;el.classList.add("flash")}
+});
+function restoreAnswers(){
+  $$("input.txt[data-n]").forEach(i=>i.value=S.ans[i.dataset.n]||"");
+  $$('input[type=radio][data-n]').forEach(i=>i.checked=S.ans[i.dataset.n]===+i.value);
+  $$("select.sel[data-n]").forEach(s=>s.value=S.ans[s.dataset.n]||"");
+  $$("input[data-two]").forEach(i=>i.checked=(S.ans[i.dataset.two]||[]).includes(+i.value));
+  $$(".chip[data-n]").forEach(c=>c.classList.toggle("on",S.ans[c.dataset.n]===c.dataset.v));
+}
+
+/* ================= TABS ================= */
+function go(v){$$("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.v===v));$$(".view").forEach(x=>x.classList.toggle("on",x.id==="v-"+v));
+  if(v[0]==="p")curP=+v[1];if(v==="res")renderResults();window.scrollTo({top:0})}
+$("#tabs").addEventListener("click",e=>{const b=e.target.closest("button");if(b)go(b.dataset.v)});
+
+/* ================= HIGHLIGHTER ================= */
+const bar=$("#hlbar");
+function selInPassage(){const s=getSelection();if(!s.rangeCount||s.isCollapsed)return null;const r=s.getRangeAt(0);const root=r.commonAncestorContainer.nodeType===1?r.commonAncestorContainer:r.commonAncestorContainer.parentNode;const sp=root.closest(".scrollp");return sp?{r,sp}:null}
+function apply(color){
+  const x=selInPassage();if(!x)return;const {r,sp}=x;
+  const w=document.createTreeWalker(sp,NodeFilter.SHOW_TEXT,{acceptNode:n=>r.intersectsNode(n)&&n.nodeValue.trim()&&!n.parentNode.closest(".L,.ptitle,.pnote")?1:2});
+  const nodes=[];while(w.nextNode())nodes.push(w.currentNode);
+  nodes.forEach(n=>{let s=n===r.startContainer?r.startOffset:0,e=n===r.endContainer?r.endOffset:n.nodeValue.length;if(s>=e)return;
+    let t=n;if(s>0)t=t.splitText(s);if(e-s<t.nodeValue.length)t.splitText(e-s);
+    const pm=t.parentNode.closest("mark.hl");if(pm){pm.className="hl hl-"+color;return}
+    const m=document.createElement("mark");m.className="hl hl-"+color;t.parentNode.insertBefore(m,t);m.appendChild(t)});
+  getSelection().removeAllRanges();bar.style.display="none";
+}
+function unwrap(m){const p=m.parentNode;while(m.firstChild)p.insertBefore(m.firstChild,m);p.removeChild(m);p.normalize()}
+function showBar(){const x=selInPassage();if(!x||erasing){bar.style.display="none";return}
+  const rc=x.r.getBoundingClientRect();bar.style.display="flex";const bw=170;
+  bar.style.left=Math.max(8,Math.min(innerWidth-bw-8,rc.left+rc.width/2-bw/2))+"px";bar.style.top=(rc.top>60?rc.top-50:rc.bottom+10)+"px"}
+document.addEventListener("mouseup",e=>{if(e.target.closest("#hlbar"))return;setTimeout(showBar,10)});
+document.addEventListener("touchend",e=>{if(e.target.closest("#hlbar"))return;setTimeout(showBar,250)});
+bar.addEventListener("mousedown",e=>e.preventDefault());
+bar.addEventListener("click",e=>{const b=e.target.closest(".pen");if(b){pen=b.dataset.c;apply(pen);syncPens()}});
+function syncPens(){$$(".tools .pen").forEach(b=>b.classList.toggle("on",erasing?b.dataset.pen==="er":b.dataset.pen===pen))}
+document.addEventListener("click",e=>{
+  const pb=e.target.closest(".tools .pen");
+  if(pb){if(pb.dataset.pen==="er"){erasing=!erasing}else{erasing=false;pen=pb.dataset.pen;if(selInPassage())apply(pen)}document.body.classList.toggle("erasing",erasing);syncPens();return}
+  const cl=e.target.closest("[data-clear]");if(cl){$$(`#pt${cl.dataset.clear} mark.hl`).forEach(unwrap);return}
+  const kw=e.target.closest("[data-kw]");if(kw){const on=!kw.classList.contains("on");$$("[data-kw]").forEach(k=>k.classList.toggle("on",on));document.body.classList.toggle("showkw",on);return}
+  const gl=e.target.closest("[data-gl]");if(gl){openGlossary(+gl.dataset.gl);return}
+  if(erasing){const m=e.target.closest(".scrollp mark.hl");if(m){unwrap(m);return}}
+  const g=e.target.closest(".g");const tip=$("#tip");
+  if(g&&getSelection().isCollapsed){const w=gmap[g.dataset.k];if(!w)return;tip.innerHTML=`<b>${esc(w[0])}</b> <i>(${esc(w[1])})</i><br>${esc(w[2])}<span class="ar">${esc(w[3])}</span>`;
+    const rc=g.getBoundingClientRect();tip.style.display="block";tip.style.left=Math.max(8,Math.min(innerWidth-310,rc.left))+"px";tip.style.top=(rc.bottom+8+120>innerHeight?rc.top-tip.offsetHeight-8:rc.bottom+8)+"px"}
+  else if(!e.target.closest("#tip"))tip.style.display="none";
+});
+addEventListener("scroll",()=>{$("#tip").style.display="none";bar.style.display="none"},true);
+
+/* ================= GLOSSARY DRAWER ================= */
+let glP=1;
+function openGlossary(p){glP=p;$("#dTitle").textContent=`Glossary · Passage ${p}`;$("#dSearch").value="";drawList();$("#drawer").classList.add("open");$("#shade").style.display="block"}
+function drawList(){const q=norm($("#dSearch").value);
+  $("#dList").innerHTML=GL[glP].filter(w=>!q||w[0].includes(q)||norm(w[2]).includes(q)).map(w=>`<div class="gw"><b>${esc(w[0])}</b><i>${esc(w[1])}</i><div class="m">${esc(w[2])}</div><div class="ar">${esc(w[3])}</div></div>`).join("")||"<p>No match.</p>"}
+$("#dSearch").addEventListener("input",drawList);
+$("#dHide").addEventListener("click",e=>{const on=$("#drawer").classList.toggle("hidear");e.target.textContent=on?"Show Arabic":"Hide Arabic (test me)"});
+$("#dList").addEventListener("click",e=>{const a=e.target.closest(".ar");if(a)a.classList.toggle("peek")});
+const closeD=()=>{$("#drawer").classList.remove("open");$("#shade").style.display="none"};
+$("#dClose").addEventListener("click",closeD);$("#shade").addEventListener("click",closeD);
+
+/* ================= WORD WORKOUT ================= */
+function renderWW(){
+  $("#wwBody").innerHTML=`<div class="card"><h2>Word Workout</h2><p>The key words from the readings, in new everyday sentences. Choose the best word for each gap. Each word is used once. Open the 📖 Glossary in any passage if you need help.</p></div>`+
+  WW.map((s,si)=>`<div class="card"><h2 style="font-size:21px">${esc(s.t)}</h2><div class="bank" id="bank${si}">${s.words.map(w=>`<span data-w="${w}">${w}</span>`).join("")}</div>
+  ${s.items.map((it,ii)=>{const k=si+"-"+ii;return `<div class="ws" id="ws${k}"><b>${ii+1}.</b> ${esc(it[0]).replace("___",`<select class="sel wsel" data-k="${k}"><option value="">choose…</option>${[...s.words].sort().map(w=>`<option>${w}</option>`).join("")}</select>`)}<span class="wfb"></span></div>`}).join("")}</div>`).join("")+
+  `<div class="actions"><button class="big" id="wwCheck">Check my words</button><button class="big out" id="wwReset">Try again</button></div><div class="pscore" id="wwScore"></div>`;
+  $("#wwCheck").onclick=()=>{S.wwChecked=true;checkWW()};
+  $("#wwReset").onclick=()=>{S.ww={};S.wwChecked=false;renderWW()};
+  $$("select.wsel").forEach(s=>s.value=S.ww[s.dataset.k]||"");syncBank();if(S.wwChecked)checkWW();
+}
+function syncBank(){WW.forEach((s,si)=>{const used=s.items.map((_,ii)=>S.ww[si+"-"+ii]);$$(`#bank${si} span`).forEach(sp=>sp.classList.toggle("used",used.includes(sp.dataset.w)))})}
+function checkWW(){let sc=0,tot=0;WW.forEach((s,si)=>s.items.forEach((it,ii)=>{const k=si+"-"+ii,ok=S.ww[k]===it[1];tot++;if(ok)sc++;const d=$(`#ws${k}`);d.className="ws "+(ok?"right":"wrong");d.querySelector(".wfb").innerHTML=ok?" ✅":` ❌ <b>${it[1]}</b>`}));
+  $("#wwScore").textContent=`Word Workout: ${sc} / ${tot}`;if(sc===tot)confetti()}
+
+/* ================= RESULTS ================= */
+function band(s){const t=[[39,9],[37,8.5],[35,8],[33,7.5],[30,7],[27,6.5],[23,6],[19,5.5],[15,5],[13,4.5],[10,4],[8,3.5],[6,3],[4,2.5]];for(const[a,b]of t)if(s>=a)return b;return s>0?2:0}
+function renderResults(){
+  const done=[1,2,3].filter(i=>S.checked[i]);
+  if(!done.length){$("#resBody").innerHTML=`<div class="card"><h2>Results</h2><p>Check at least one passage first (press <b>Check Passage</b> under the questions). Your full score, band and question-type report will appear here.</p></div>`;return}
+  const all=done.flatMap(i=>mark(P[i-1])),sc=all.filter(x=>x.ok).length,full=done.length===3,pct=Math.round(sc/all.length*100);
+  const types={};all.forEach(x=>{const t=types[x.type]=types[x.type]||{ok:0,n:0};t.n++;if(x.ok)t.ok++});
+  const weak=Object.entries(types).filter(([k,v])=>v.ok/v.n<.6).map(([k])=>TL[k]);
+  $("#resBody").innerHTML=`<div class="card"><h2>${full?"Your result":"Results so far"}</h2>
+  <div class="score"><div class="tile"><div class="v">${sc} / ${all.length}</div><div class="k">Correct answers</div></div>
+  <div class="tile"><div class="v">${pct}%</div><div class="k">Accuracy</div></div>
+  <div class="tile"><div class="v">${full?band(sc):"–"}</div><div class="k">${full?"Estimated band (Academic)":"Band shows after all 3 passages"}</div></div>
+  ${done.map(i=>{const r=mark(P[i-1]);return `<div class="tile"><div class="v">${r.filter(x=>x.ok).length}/${r.length}</div><div class="k">Passage ${i}</div></div>`}).join("")}</div>
+  ${weak.length?`<p><b>Focus next on:</b> ${weak.join(", ")}. Re-read the explanations below and go back to the paragraph each time.</p>`:`<p><b>Great balance</b> – no weak question type below 60%.</p>`}
+  ${full&&pct>=80?`<div class="actions"><button class="big" id="certB">🏅 Print my certificate</button></div>`:full?`<p>Reach <b>32 / 40 (80%)</b> to unlock your certificate. Press <b>Try again</b> on a passage to improve your score.</p>`:""}</div>
+  <div class="card"><h2 style="font-size:21px">By question type</h2>${Object.entries(types).map(([k,v])=>`<div class="trow"><span>${TL[k]}</span><div class="bar"><i style="width:${v.ok/v.n*100}%"></i></div><span class="pc">${v.ok}/${v.n}</span></div>`).join("")}</div>
+  <div class="card"><h2 style="font-size:21px">Answer review</h2><div class="scroll"><table class="rev"><thead><tr><th>Q</th><th>Your answer</th><th>Correct</th><th>Why</th></tr></thead><tbody>
+  ${all.map(x=>`<tr><td><b>${x.n}</b></td><td class="${x.ok?"ok":"no"}">${esc(x.user)} ${x.ok?"✓":"✗"}</td><td>${esc(x.right)}</td><td>${esc(x.ex)} <button class="ev" style="border:0;background:var(--sage);color:#fff;border-radius:8px;padding:3px 9px;font-size:13px" data-ev="${x.p}${x.ev}">Para ${x.ev}</button></td></tr>`).join("")}</tbody></table></div></div>`;
+  const cb=$("#certB");if(cb)cb.onclick=()=>printCert(sc);
+}
+function printCert(sc){const nm=$("#sname").value.trim()||"Student";
+  $("#cert").innerHTML=`<div class="certbox"><p style="font-size:18px;letter-spacing:.5px">Certificate of Achievement</p><h2>Final Reading Practice</h2><p>This certifies that</p><div class="who">${esc(nm)}</div>
+  <p style="font-size:19px">scored <b>${sc} / 40</b> (estimated band <b>${band(sc)}</b>) on the IELTS Academic Reading final practice.</p><p>${new Date().toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"})}</p><p style="margin-top:28px;color:#6E6560">Designed by: Nazila Motahari</p></div>`;
+  try{window.print()}catch(e){toast("Printing is blocked here – open the app from your GitHub link to print.")}}
+function celebrateIfDone(){if([1,2,3].every(i=>S.checked[i])){const sc=[1,2,3].flatMap(i=>mark(P[i-1])).filter(x=>x.ok).length;if(sc>=32)confetti();toast(`All passages checked: ${sc}/40. Open Results for your band.`)}}
+
+/* ================= TIMER ================= */
+function fmt(t){return String(Math.floor(t/60)).padStart(2,"0")+":"+String(t%60).padStart(2,"0")}
+$("#tbtn").addEventListener("click",()=>{running=!running;$("#tbtn").textContent=running?"Pause":"Start";
+  if(running)tick=setInterval(()=>{if(S.time>0){S.time--;$("#clock").textContent=fmt(S.time);if(S.time===600)toast("10 minutes left!");if(S.time===0){running=false;clearInterval(tick);$("#tbtn").textContent="Start";toast("Time is up! Check your answers.")}}},1000);else clearInterval(tick)});
+
+/* ================= SAVE / LOAD ================= */
+$("#saveB").addEventListener("click",()=>{
+  P.forEach(p=>S.hl[p.id]=$(`#pt${p.id}`).innerHTML);
+  const data=JSON.stringify({app:"final-reading-practice",name:$("#sname").value,...S});
+  try{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([data],{type:"application/json"}));a.download=`reading-practice-${($("#sname").value||"student").replace(/\s+/g,"-")}.json`;document.body.appendChild(a);a.click();a.remove();toast("Saved – keep the file to continue later.")}
+  catch(e){toast("Saving is blocked here – open the app from your GitHub link.")}
+});
+$("#loadF").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(d.app!=="final-reading-practice")throw 0;
+  Object.assign(S,{ans:d.ans||{},ww:d.ww||{},checked:d.checked||{},wwChecked:!!d.wwChecked,time:d.time??3600,hl:d.hl||{}});$("#sname").value=d.name||"";$("#clock").textContent=fmt(S.time);
+  P.forEach(p=>{if(S.hl[p.id])$(`#pt${p.id}`).innerHTML=S.hl[p.id]});
+  restoreAnswers();[1,2,3].forEach(i=>{if(S.checked[i])showCheck(i);else lockInputs(i,false)});renderWW();toast("Your work is back!")}catch(x){toast("That file is not from this app.")}};r.readAsText(f);e.target.value=""});
+
+/* ================= TOAST + CONFETTI ================= */
+let tt;function toast(m){const t=$("#toast");t.textContent=m;t.style.display="block";clearTimeout(tt);tt=setTimeout(()=>t.style.display="none",3200)}
+function confetti(){if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;const c=$("#confetti"),x=c.getContext("2d");c.width=innerWidth;c.height=innerHeight;
+  const cols=["#B9502F","#5E8063","#FFE86B","#F7B3CF","#A8D4F5"],ps=Array.from({length:160},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height*.5,r:4+Math.random()*6,v:2+Math.random()*4,a:Math.random()*6,c:cols[Math.random()*5|0]}));
+  let f=0;(function d(){x.clearRect(0,0,c.width,c.height);ps.forEach(p=>{p.y+=p.v;p.a+=.1;x.fillStyle=p.c;x.fillRect(p.x+Math.sin(p.a)*8,p.y,p.r,p.r*1.6)});if(++f<220)requestAnimationFrame(d);else x.clearRect(0,0,c.width,c.height)})()}
+
+renderWW();
+}
+</script>
+</body>
+</html>
